@@ -65,7 +65,8 @@ Further differentiation will show that the second derivative is negative, i.e. t
 > Determine the MLE of the rate parameter $$\lambda$$ for a Poisson distribution and show that it is an unbiased estimator of the true rate parameter.
 >
 >> ## Solution
->> For fixed observed counts $$x$$ and a uniform prior on $$\lambda$$, the Poisson distribution $$P(\lambda \vert x) \propto \lambda^{x} e^{-\lambda}$$. Therefore the log-likelihood is:
+>> For fixed observed counts $$x$$, the Poisson distribution likelihood $$l(x \vert
+> \lambda) \propto \lambda^{x} e^{-\lambda}$$. Therefore the log-likelihood is:
 >> $$L(\lambda) = x\ln(\lambda) -\lambda$$
 >> $$\quad \rightarrow \quad \frac{\mathrm{d}L}{\mathrm{d}\lambda}\bigg\rvert_{\hat{\lambda}} = \frac{x}{\hat{\lambda}} - 1 = 0 \quad \rightarrow \quad \hat{\lambda} = x$$
 >>
@@ -78,7 +79,7 @@ Further differentiation will show that the second derivative is negative, i.e. t
 >> <p align='center'>
 >> <img alt="Chi-squared distributions" src="../fig/ep10_poissmles.png" width="400"/>
 >> </p>
->> <p style="text-align:center">Poisson posterior distribution MLEs are equal to the observed rate.  </p>
+>> <p style="text-align:center">Poisson likelihood MLEs are equal to the observed rate.  </p>
 >>
 > {: .solution}
 {: .challenge}
@@ -102,11 +103,11 @@ The equation on the right hand side should be familiar to us: it is the [__norma
 
 $$p(x\vert \mu,\sigma)=\frac{1}{\sigma \sqrt{2\pi}} e^{-(x-\mu)^{2}/(2\sigma^{2})}$$
 
-i.e. for smooth log-likelihood functions, the posterior probability distribution of the parameter $$\theta$$ can be approximated with a normal distribution about the MLE $$\hat{\theta}$$, i.e. with mean $$\mu=\hat{\theta}$$ and variance $$\sigma^{2}=-\left(\frac{\mathrm{d}^{2}L}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}}\right)^{-1}$$. Thus, assuming this _Gaussian_ or [__normal approximation__]({{ page.root }}/reference/#normal-approximation) , we can estimate a 1-$$\sigma$$ uncertainty or [__error__]({{ page.root }}/reference/#error) on $$\theta$$ which corresponds to a range about the MLE value where the true value should be $$\simeq$$68.2% of the time:
+i.e. for smooth log-likelihood functions, the probability distribution of the parameter $$\theta$$ can be approximated with a normal distribution about the MLE $$\hat{\theta}$$, i.e. with mean $$\mu=\hat{\theta}$$ and variance $$\sigma^{2}=-\left(\frac{\mathrm{d}^{2}L}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}}\right)^{-1}$$. Thus, assuming this _Gaussian_ or [__normal approximation__]({{ page.root }}/reference/#normal-approximation) , we can estimate a 1-$$\sigma$$ uncertainty or [__error__]({{ page.root }}/reference/#error) on $$\theta$$ which corresponds to a range about the MLE value where the true value should be $$\simeq$$68.2% of the time:
 
 $$\sigma = \left(-\frac{\mathrm{d}^{2}L}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}}\right)^{-1/2}$$
 
-How accurate this estimate for $$\sigma$$ is will depend on how closely the MLE probability distribution approximates a normal distribution, at least in the region of parameter values that contains most of the probability. The estimate will become exact in the case where the MLE is normally distributed.
+How accurate this estimate for $$\sigma$$ is will depend on how closely the parameter probability distribution approximates a normal distribution, at least in the region of parameter values that contains most of the probability. The estimate will become exact in the case where the parameter is normally distributed.
 
 > ## Test yourself: errors on Binomial and Poisson MLEs
 > Use the normal approximation to estimate the standard deviation on the MLE for binomial and Poisson distributed likelihood functions, in terms of the observed data ($$x$$ successes in $$n$$ trials, or $$x$$ counts). 
