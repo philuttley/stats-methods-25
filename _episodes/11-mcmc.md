@@ -1,6 +1,6 @@
 ---
 title: >-
-   12. MCMC for model-fitting and error estimation
+   11. MCMC for model-fitting and error estimation
 teaching: 60
 exercises: 60
 questions:
