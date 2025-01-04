@@ -33,23 +33,25 @@ import scipy.stats as sps
 
 ## Maximum likelihood estimation
 
-Consider a hypothesis which is specified by a single parameter $$\theta$$, for which we can calculate the posterior pdf (given data vector $$\mathbf{x}$$), $$p(\theta \vert \mathbf{x})$$. Based on the posterior distribution, what would be a good estimate for $$\theta$$? We could consider obtaining the mean of $$p(\theta\vert \mathbf{x})$$, but this may often be skewed if the distribution has asymmetric tails, and is also difficult to calculate in many cases. A better estimate would involve finding the value of $$\theta$$ which maximises the posterior probability density. I.e. we should find the value of $$\theta$$ corresponding to the peak (i.e. the [__mode__]({{ page.root }}/reference/#mode)) of the posterior pdf. Therefore we require:
+Imagine we have some data $$\mathbf{x}$$ and a corresponding probability distribution for that data which can be calculated for a single parameter $$\theta$$. Based on this information we can calculate the [__likelihood__]({{ page.root }}/reference/#likelihood) $$l(\mathbf{x} \vert \theta)$$, which refers to the likelihood of obtaining the data (or some statistic calculated from it), given an assumed pdf (our hypothesis) and the value of $$\theta$$. Note that there is a subtle but important difference between the likelihood and the [pdf]({{ page.root }}/reference/#pdf). The pdf gives the probability distribution of the variate(s) (the data or test statistic) for a given hypothesis and its (fixed) parameters. The likelihood gives the probability for fixed variate(s) __as a function of the hypothesis parameters__.
 
-$$\frac{\mathrm{d}p}{\mathrm{d}\theta}\bigg\rvert_{\hat{\theta}} = 0 \quad \mbox{and} \quad \frac{\mathrm{d}^{2}p}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}} < 0$$
+Based on the likelihood, what would be a good estimate for $$\theta$$? We could consider obtaining the mean of $$l(\mathbf{x} \vert \theta)$$, but this may often be skewed if the distribution has asymmetric tails, and is also difficult to calculate in many cases. A better estimate would involve finding the value of $$\theta$$ which maximises the probability density. I.e. we should find the value of $$\theta$$ corresponding to the peak (i.e. the [__mode__]({{ page.root }}/reference/#mode)) of the likelihood. Therefore we require:
 
-where $$\hat{\theta}$$ is the value of the parameter corresponding to the maximum probability density. This quantity is referred to as the _maximum likelihood_, although the pdf used is the posterior rather than the likelihood in Bayes' theorem (but the two are equivalent for uniform priors). The parameter value $$\hat{\theta}$$ corresponding to the maximum likelihood is the best [__estimator__]({{ page.root }}/reference/#estimator) for $$\theta$$ and is known as the _maximum likelihood estimate_ of $$\theta$$ or [__MLE__]({{ page.root }}/reference/#mle). The process of maximising the likelihood to obtain MLEs is known as [__maximum likelihood estimation__]({{ page.root }}/reference/#maximum-likelihood-estimation).
+$$\frac{\mathrm{d}l}{\mathrm{d}\theta}\bigg\rvert_{\hat{\theta}} = 0 \quad \mbox{and} \quad \frac{\mathrm{d}^{2}l}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}} < 0$$
+
+where $$\hat{\theta}$$ is the value of the parameter corresponding to the maximum probability density. This quantity is referred to as the _maximum likelihood_. The parameter value $$\hat{\theta}$$ corresponding to the maximum likelihood is the best [__estimator__]({{ page.root }}/reference/#estimator) for $$\theta$$ and is known as the _maximum likelihood estimate_ of $$\theta$$ or [__MLE__]({{ page.root }}/reference/#mle). The process of maximising the likelihood to obtain MLEs is known as [__maximum likelihood estimation__]({{ page.root }}/reference/#maximum-likelihood-estimation).
 
 ## Log-likelihood and MLEs
 
-Many posterior probability distributions are quite 'peaky' and it is often easier to work with the smoother transformation $$L(\theta)=\ln[p(\theta)]$$ (where we now drop the conditionality on the data, which we assume as a given).  $$L(\theta)$$ is a monotonic function of $$p(\theta)$$ so it must also satisfy the relations for a maximum to occur for the same MLE value, i.e:
+Many likelihood distributions are quite 'peaky' and it is often easier to work with the smoother transformation $$L(\theta)=\ln[l(\theta)]$$ (where we now drop the conditionality on the data, which we assume as a given).  $$L(\theta)$$ is a monotonic function of $$l(\theta)$$ so it must also satisfy the relations for a maximum to occur for the same MLE value, i.e:
 
 $$\frac{\mathrm{d}L}{\mathrm{d}\theta}\bigg\rvert_{\hat{\theta}} = 0 \quad \mbox{and} \quad \frac{\mathrm{d}^{2}L}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}} < 0$$
 
-Furthermore, the log probability also has the advantages that products become sums, and powers become multiplying constants, which besides making calculations simpler, also avoids the computational errors that occur for the extremely large or small numbers obtained when multiplying the likelihood for many measurements. We will use this property to calculate the MLEs for some well-known distributions (i.e. we assume a uniform prior so we only consider the likelihood function of the distribution) and demonstrate that the MLEs are the best estimators of function parameters.
+Furthermore, the log probability also has the advantages that products become sums, and powers become multiplying constants, which besides making calculations simpler, also avoids the computational errors that occur for the extremely large or small numbers obtained when multiplying the likelihood for many measurements. We will use this property to calculate the MLEs for some well-known distributions and demonstrate that the MLEs are the best estimators of function parameters.
 
 Firstly, consider a [_binomial distribution_]({{ page.root }}/reference/#distributions---binomial):
 
-$$p(\theta\vert x, n) \propto \theta^{x} (1-\theta)^{n-x}$$
+$$l(x \vert \theta, n) \propto \theta^{x} (1-\theta)^{n-x}$$
 
 where $$x$$ is now the _observed_ number of successes in $$n$$ trials and success probability $$\theta$$ is a parameter which is the variable of the function. We can neglect the binomial constant since we will take the logarithm and then differentiate, to obtain the maximum log-likelihood:
 
@@ -71,21 +73,20 @@ Further differentiation will show that the second derivative is negative, i.e. t
 >>
 >> Therefore, the observed rate $$x$$ is the MLE for $$\lambda$$.
 >>
->> For the Poisson distribution, $$E[X]=\lambda$$, therefore since $$E[x]=E[X] = E[\hat{\lambda}]$$, the MLE is an unbiased estimator of the true $$\lambda$$. You might wonder why we get this result when in the challenge in the previous episode, we showed that the mean of the prior probability distribution for the Poisson rate parameter and observed rate $$x=4$$ was 5! 
+>> For the Poisson distribution, $$E[X]=\lambda$$, therefore since $$E[x]=E[X] = E[\hat{\lambda}]$$, the MLE is an unbiased estimator of the true $$\lambda$$. 
 >>
 >> <p align='center'>
 >> <img alt="Chi-squared distributions" src="../fig/ep10_poissmles.png" width="400"/>
 >> </p>
 >> <p style="text-align:center">Poisson posterior distribution MLEs are equal to the observed rate.  </p>
 >>
->> The mean of the posterior distribution $$\langle \lambda \rangle$$ is larger than the MLE (which is equivalent to the [_mode_]({{ page.root }}/reference/#mode) of the distribution, because the distribution is positively skewed (i.e. skewed to the right). However, over many repeated experiments with the same rate parameter $$\lambda_{\mathrm{true}}$$, $$E[\langle \lambda \rangle]=\lambda_{\mathrm{true}}+1$$, while $$E[\hat{\lambda}]=\lambda_{\mathrm{true}}$$.  I.e. the mean of the posterior distribution is a biased estimator in this case, while the MLE is not.
 > {: .solution}
 {: .challenge}
 
 
 ## Errors on MLEs
 
-It's important to remember that the MLE $$\hat{\theta}$$ is only an _estimator_ for the  true parameter value $$\theta_{\mathrm{true}}$$, which is contained somewhere in the posterior probability distribution for $$\theta$$, with probability of it occuring in a certain range, given by integrating the distribution over that range, as is the case for the pdf of a random variable. Previously, we looked at the approach of using the posterior distribution to define [__confidence intervals__]({{ page.root }}/reference/#confidence-interval). Now we will examine a simpler approach to estimating the error on an MLE, which is exact for the case of a posterior which is a normal distribution.
+It's important to remember that the MLE $$\hat{\theta}$$ is only an _estimator_ for the  true parameter value $$\theta_{\mathrm{true}}$$, which is contained somewhere in the probability distribution for $$\theta$$, with probability of it occuring in a certain range, given by integrating the distribution over that range, as is the case for the pdf of a random variable. 
 
 Consider a log-likelihood $$L(\theta)$$ with maximum at the MLE, at $$L(\hat{\theta})$$. We can examine the shape of the probability distribution of $$\theta$$ around $$\hat{\theta}$$ by expanding $$L(\theta)$$ about the maximum:
 
@@ -93,9 +94,9 @@ $$L(\theta) = L(\hat{\theta}) + \frac{1}{2} \frac{\mathrm{d}^{2}L}{\mathrm{d}\th
 
 where the 1st order term is zero because $$\frac{\mathrm{d}L}{\mathrm{d}\theta}\bigg\rvert_{\hat{\theta}} = 0$$ at $$\theta=\hat{\theta}$$, by definition.
 
-For smooth log-likelihoods, where we can neglect the higher order terms, the distribution around the MLE can be approximated by a parabola with width dependent on the 2nd derivative of the log-likelihood. To see what this means, lets transform back to the probability, $$p(\theta)=\exp\left(L(\theta)\right)$$:
+For smooth log-likelihoods, where we can neglect the higher order terms, the distribution around the MLE can be approximated by a parabola with width dependent on the 2nd derivative of the log-likelihood. To see what this means, lets transform back to the probability, $$l(\theta)=\exp\left(L(\theta)\right)$$:
 
-$$L(\theta) = L(\hat{\theta}) + \frac{1}{2} \frac{\mathrm{d}^{2}L}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}}(\theta-\hat{\theta})^{2} \quad \Rightarrow \quad p(\theta) = p(\hat{\theta})\exp\left[\frac{1}{2} \frac{\mathrm{d}^{2}L}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}}(\theta-\hat{\theta})^{2}\right]$$
+$$L(\theta) = L(\hat{\theta}) + \frac{1}{2} \frac{\mathrm{d}^{2}L}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}}(\theta-\hat{\theta})^{2} \quad \Rightarrow \quad l(\theta) = l(\hat{\theta})\exp\left[\frac{1}{2} \frac{\mathrm{d}^{2}L}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}}(\theta-\hat{\theta})^{2}\right]$$
 
 The equation on the right hand side should be familiar to us: it is the [__normal distribution__]({{ page.root }}/reference/#distributions---normal)!
 
@@ -105,7 +106,7 @@ i.e. for smooth log-likelihood functions, the posterior probability distribution
 
 $$\sigma = \left(-\frac{\mathrm{d}^{2}L}{\mathrm{d}\theta^{2}}\bigg\rvert_{\hat{\theta}}\right)^{-1/2}$$
 
-How accurate this estimate for $$\sigma$$ is will depend on how closely the posterior distribution approximates a normal distribution, at least in the region of parameter values that contains most of the probability. The estimate will become exact in the case where the posterior is normally distributed.
+How accurate this estimate for $$\sigma$$ is will depend on how closely the MLE probability distribution approximates a normal distribution, at least in the region of parameter values that contains most of the probability. The estimate will become exact in the case where the MLE is normally distributed.
 
 > ## Test yourself: errors on Binomial and Poisson MLEs
 > Use the normal approximation to estimate the standard deviation on the MLE for binomial and Poisson distributed likelihood functions, in terms of the observed data ($$x$$ successes in $$n$$ trials, or $$x$$ counts). 
@@ -126,9 +127,9 @@ How accurate this estimate for $$\sigma$$ is will depend on how closely the post
 
 ## Using optimisers to obtain MLEs
 
-For the distributions discussed so far, the MLEs could be obtained analytically from the derivatives of the likelihood function. However, in most practical examples, the data are complex (i.e. multiple measurements) and the model distribution may include multiple parameters, making an analytical solution impossible. In some cases, like those we have examined so far, it is possible to calculate the posterior distribution numerically. However, that can be very challenging when considering complex data and/or models with many parameters, leading to a multi-dimensional parameter _hypersurface_ which cannot be efficiently mapped using any kind of computation over a dense grid of parameter values. Furthermore, we may only want the MLEs and perhaps their errors, rather than the entire posterior pdf. In these cases, where we do not need or wish to calculate the complete posterior distribution, we can obtain the MLEs numerically, via a numerical approach called _optimisation_.
+For the distributions discussed so far, the MLEs could be obtained analytically from the derivatives of the likelihood function. However, in most practical examples, the data are complex (i.e. multiple measurements) and the model distribution may include multiple parameters, making an analytical solution impossible. In some cases, like those we have examined so far, it is possible to calculate the MLE probability distribution numerically. However, that can be very challenging when considering complex data and/or models with many parameters, leading to a multi-dimensional parameter _hypersurface_ which cannot be efficiently mapped using any kind of computation over a dense grid of parameter values. Furthermore, we may only want the MLEs and perhaps their errors, rather than the entire pdf of the MLEs. In these cases, where we do not need or wish to calculate the complete distribution, we can obtain the MLEs numerically, via a numerical approach called _optimisation_.
 
-Optimisation methods use algorithmic approaches to obtain either the minimum or maximum of a function of one or more adjustable parameters. These approaches are implemented in software using _optimisers_. We do not need the normalised posterior pdf in order to obtain an MLE, since only the pdf shape matters to find the peak. So the function to be optimised is often the likelihood function (for the uniform prior case) or product of likelihood and prior, or commonly some variant of those, such as the log-likelihood or, as we will see later [_weighted least squares_]({{ page.root }}/reference/#weighted-least-squares), colloquially known as [_chi-squared fitting_]({{ page.root }}/reference/#chi-squared-fitting). 
+Optimisation methods use algorithmic approaches to obtain either the minimum or maximum of a function of one or more adjustable parameters. These approaches are implemented in software using _optimisers_. We do not need the correctly normalised pdf in order to obtain an MLE, since only the pdf shape matters to find the peak. So the function to be optimised is often the log-likelihood or, as we will see later [_weighted least squares_]({{ page.root }}/reference/#weighted-least-squares), colloquially known as [_chi-squared fitting_]({{ page.root }}/reference/#chi-squared-fitting). 
 
 
 > ## Optimisation methods and the `scipy.optimize` module.
