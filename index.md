@@ -4,7 +4,7 @@ root: .
 permalink: index.html
 ---
 
-This is the course material for the Statistical Methods for the Physical Sciences course, beginning in January 2024. To easily run and modify the code examples and do the challenges and 'intuition builders', you will need to open a jupyter notebook (with magic command `%matplotlib inline` or `%matplotlib notebook` in the first cell to enable inline or interactive plotting), or another Python interpreter/IDE of your choice.
+This is the course material for the Statistical Methods for the Physical Sciences course, beginning in January 2025. To easily run and modify the code examples and do the challenges and 'intuition builders', you will need to open a jupyter notebook (with magic command `%matplotlib inline` or `%matplotlib notebook` in the first cell to enable inline or interactive plotting), or another Python interpreter/IDE of your choice.
 
 
 > ## Prerequisites
