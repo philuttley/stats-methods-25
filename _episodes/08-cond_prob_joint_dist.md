@@ -1,6 +1,6 @@
 ---
 title: >-
-    5. Conditional probability and joint probability distributions
+    8. Conditional probability and joint probability distributions
 teaching: 60
 exercises: 60
 questions:
