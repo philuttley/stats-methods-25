@@ -32,7 +32,7 @@ import scipy.optimize as spopt
 ## Statistical properties of multivariate data
 So far, we have considered statistical tests of [__univariate__]({{ page.root }}/reference/#univariate) data by realising that the data themselves can be thought of as random variates. Many data sets consist of measurements of mutliple quantities, i.e. they are [__multivariate__]({{ page.root }}/reference/#multivariate) data. For example, optical measurements of a sample of galaxies may produce measurements of their distance, size, luminosity and metallicity for each galaxy. 
 
-To understand the statistical properties of these data, such as their means, variance and covariance, and devise statistical tests of simple hypotheses, we can refer to what we have learned about random variates darwn multivariate probability distributions.  For simplicity we will focus on a [__bivariate__]({{ page.root }}/reference/#bivariate) description in terms of variates $$X$$ and $$Y$$ which represent the measurements of two paired quantities (e.g. different quantities for a given object), although we will note how these generalise when including more variates.
+For simplicity we will focus on a [__bivariate__]({{ page.root }}/reference/#bivariate) description in terms of variates $$X$$ and $$Y$$ which represent the measurements of two paired quantities (e.g. different quantities for a given object), although we will note how these generalise when including more variates.
 
 ### Sample means, variances and errors on the mean
 
