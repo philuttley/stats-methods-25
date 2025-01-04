@@ -1,6 +1,6 @@
 ---
 title: >-
-    8. Confidence intervals, errors and bootstrapping
+    10. Confidence intervals, errors and bootstrapping
 teaching: 60
 exercises: 60
 questions:
