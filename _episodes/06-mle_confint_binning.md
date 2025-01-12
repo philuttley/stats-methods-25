@@ -1,20 +1,23 @@
 ---
 title: >-
-    6. Confidence intervals on MLEs and fitting binned Poisson event data
+    6. Confidence intervals on MLEs, fitting binned Poisson event data and bootstrapping
 teaching: 60
 exercises: 60
 questions:
 - "How do we calculate exact confidence intervals and regions for normally distributed model parameters?"
 - "How should we fit models to binned univariate data, such as photon spectra?"
+- "With minimal assumptions, can we use our data to estimate uncertainties in a variety of measurements obtained from it?"
 objectives:
 - "Learn how to calculate and plot 1- and 2-D confidence intervals for normally distributed MLEs, given any enclosed probability and number of free parameters."
 - "Learn how to bin up univariate data so that the counts per bin are approximately normal and weighted least-squares methods can be used to fit the data."
 - "Use the Poisson likelihood function to fit models to finely binned univariate data."
+- "Learn to use bootstrapping to estimate the uncertainties on statistical quantities obtained from data."
 keypoints:
 - "For normally distributed MLEs, confidence intervals and regions can be calculated by finding the parameter values on either side of the MLE where the weighted least squares (or log-likelihood) gets larger (smaller) by a fixed amount, determined by the required confidence level and the chi-squared distribution (multiplied by 0.5 for log-likelihood) for degrees of freedom equal to the dimensionality of the confidence region (usually 1 or 2)."
 - "Confidence regions may be found using brute force grid search, although this is not efficient for joint confidence regions with multiple dimensions, in which case Markov Chain Monte Carlo fitting should be considered."
 - "Univariate data are typically binned into histograms (e.g. count distributions) and the models used to fit these data should be binned in the same way."
 - "If count distributions are binned to at least 20 counts/bin the errors remain close to normally distributed, so that weighted least squares methods may be used to fit the data and a goodness of fit obtained in the usual way. Binned data with fewer counts/bin should be fitted using minimisation of negative log-likelihood. The same approach can be used for other types of data which are not normally distributed about the 'true' values."
+- "Bootstrapping (resampling a data set with replacement, many times) offers a simple but effective way to calculate relatively low-significance confidence intervals (e.g. 1- to 2-sigma) for tens to hundreds of data values and complex transformations or calculations with the data. Higher significances require significantly larger data sets and numbers of bootstrap realisations to compute."
 ---
 
 <script src="../code/math-code.js"></script>
@@ -718,6 +721,70 @@ Unfortunately, although the Hessian (and covariance matrix) could in principle b
 > Now use the data in `photon_energies.txt` provided for this episode, with weighted least-squares to calculate 1-D and 2-D confidence regions on the power-law MLEs, plotting your results as for the Breit-Wigner example for non-binned data above. Then repeat this exercise for the unbinned histogram with Poisson likelihood function, and compare your confidence regions to see if the two approaches to the data give similar results.  Remember that the log-likelihood and the weighted least squares statistic are simply related, such that the confidence intervals for log-likelihood correspond to a change in negative log-likelihood equal to half the corresponding change for the weighted least squares statistic! 
 > 
 {: .challenge}
+
+## Bootstrapping
+
+Bootstrapping is a method to leverage the power of large samples of data (ideally $$n=100$$ or more) in order to generate 'fake' samples of data with similar statistical properties, simply by resampling the original data set with replacement. Assuming that they are the same size as the original sample, the variation in the new samples that are produced by bootstrapping is equivalent to what would be observed if the data was resampled from the underlying population. This means that bootstrapping is a remarkably cheap and easy way to produce Monte Carlo simulations of any type of quantity, estimator or statistic generated from the data. The resulting samples can thus be used to determine confidence intervals and other quantities, even when the underlying population distribution is not known.
+
+
+###  Bootstrapping to obtain error estimates
+
+Now we'll generate some fake correlated data, and then use the Numpy `choice` function (see Episode 1) to randomly select samples of the data (with replacement) for a bootstrap analysis of the variation in linear fit parameters $$a$$ and $$b$$. We will first generate fake sets of correlated $$x$$ and $$y$$ values as in the earlier example for exploring the correlation coefficient. Use 100 data points for $$x$$ and $$y$$ to start with and plot your data to check that the correlation is clear.
+
+~~~
+x = sps.norm.rvs(size=100)
+y = x + 0.5*sps.norm.rvs(size=100)
+~~~
+{: .language-python}
+
+First use `curve_fit` to obtain the $$a$$ and $$b$$ coefficients for the simulated, 'observed' data set and print your results.
+
+When making our new samples, we need to make sure we sample the same indices of the array for all variables being sampled, otherwise we will destroy any correlations that are present.  Here you can do that by setting up an array of indices matching that of your data (e.g. with `numpy.arange(len(x))`), randomly sampling from that using `choice`, and then using the `numpy.take` function to select the values of `x` and `y` which correspond to those indices of the arrays. Then use `curve_fit` to obtain the coefficients $$a$$ and $$b$$ of the linear correlation and record these values to arrays. Use a loop to repeat the process a large number of times (e.g. 1000 or greater) and finally make a scatter plot of your values of $$a$$ and $$b$$, which shows the bivariate distribution expected for these variables, given the scatter in your data. 
+
+Now find the mean and standard deviations for your bootstrapped distributions of $$a$$ and $$b$$, print them and compare with the expected errors on these values given in the lecture slides. These estimates correspond to the errors of each, ___marginalised over the other variable___. Your distribution could also be used to find the covariance or correlation coefficient between the two variables. 
+
+__Note that the standard error on the mean of $$a$$ or $$b$$ is not relevant for estimating the errors here__ because you are trying to find the scatter in the values expected from your observed number of data points, not the uncertainty on the many repeated 'bootstrap' versions of the data.
+
+Try repeating for repeated random samples of your original $$x$$ and $$y$$ values to see the change in position of the distribution as your sample changes. Try changing the number of data points in the simulated data set, to see how the scatter in the distributions change. How does the simulated distribution compare to the 'true' model values for the gradient and intercept, that you used to generate the data?
+
+__Note that if you want to do bootstrapping using a larger set of variables, you can do this more easily by using a Pandas dataframe and using the `pandas.DataFrame.sample` function__.  By setting the number of data points in the sample to be equal to the number of rows in the dataframe, you can make a resampled dataframe of the same size as the original. Be sure to sample with replacement!
+
+~~~
+nsims = 1000
+indices = np.arange(len(x))
+func = lambda x, a, b: x*a+b
+r2, pcov = spopt.curve_fit(func, x,y, p0=(1,1))
+a_obs = r2[0]
+b_obs = r2[1]
+
+print("The obtained a and b coefficients are ",a_obs,"and",b_obs,"respectively.")
+
+a_arr = np.zeros(nsims)
+b_arr = np.zeros(nsims)
+rng = np.random.default_rng()  # Set up the generator with the default system seed
+for i in range(nsims):
+    new_indices = rng.choice(indices, size=len(x), replace=True)
+    new_x = np.take(x,new_indices)
+    new_y = np.take(y,new_indices)
+    r2, pcov = spopt.curve_fit(func, new_x,new_y, p0=(1,1))
+    a_arr[i] = r2[0]
+    b_arr[i] = r2[1]
+    
+plt.figure()
+plt.plot(a_arr, b_arr, "o")
+plt.xlabel("a", fontsize=14)
+plt.ylabel("b", fontsize=14)
+plt.tick_params(axis='x', labelsize=12)
+plt.tick_params(axis='y', labelsize=12)
+plt.show()
+
+print("The mean and standard deviations of the bootstrapped samples of $a$ are:",
+      np.mean(a_arr),"and",np.std(a_arr,ddof=1),"respectively")
+print("The mean and standard deviations of the bootstrapped samples of $b$ are:",
+      np.mean(b_arr),"and",np.std(b_arr,ddof=1),"respectively")
+~~~
+{: .language-python}
+
 
 [plphoton_data]: https://github.com/philuttley/statistical-inference/tree/gh-pages/data/photon_energies.txt
 
