@@ -5,16 +5,13 @@ teaching: 60
 exercises: 60
 questions:
 - "How do we quantify the uncertainty in a parameter from its posterior distribution?"
-- "With minimal assumptions, can we use our data to estimate uncertainties in a variety of measurements obtained from it?"
 objectives:
 - "Learn how to assign confidence intervals and upper limits to model parameters based on the posterior distribution, and to carry out transformations of distributions of random variables."
-- "Learn to use bootstrapping to estimate the uncertainties on statistical quantities obtained from data."
 keypoints:
 - "Confidence intervals and upper limits on model parameters can be calculated by integrating the posterior probability distribution so that the probability within the interval or limit bounds matches the desired significance of the interval/limit."
 - "While upper limit integrals are taken from the lowest value of the distribution upwards, confidence intervals are usually centred on the median ($$P=0.5$$) for asymmetric distributions, to ensure that the full probability is enclosed."
 - "If confidence intervals (or equivalently, error bars) are required for some function of random variable, they can be calculated using the transformation of variables method, based on the fact that a transformed range of the variable contains the same probability as the original posterior pdf."
 - "A less accurate approach for obtaining errors for functions of random variables is to use propagation of errors to estimate transformed error bars, however this method implicitly assumes zero covariance between the combined variable errors and assumes that 2nd order and higher derivatives of the new variable w.r.t the original variables are negligible, i.e. the function cannot be highly non-linear."
-- "Bootstrapping (resampling a data set with replacement, many times) offers a simple but effective way to calculate relatively low-significance confidence intervals (e.g. 1- to 2-sigma) for tens to hundreds of data values and complex transformations or calculations with the data. Higher significances require significantly larger data sets and numbers of bootstrap realisations to compute."
 
 ---
 
@@ -253,68 +250,3 @@ which is a $$\chi^{2}$$ distribution for $$\nu=1$$ degrees of freedom (see a lat
 > You will probably be familiar with this formula from introductory statistics or lab data analysis courses that you have taken, as they are useful to convert errors (i.e. the standard deviation $$\sigma_{i}$$) from one more more measured quantities to obtain the error on a derived quantity. For example, for $$Z=X+Y$$ we infer $$\sigma_{z}=\sqrt{\sigma_{x}^{2}+\sigma_{y}^{2}}$$ (i.e. errors add in quadrature, as expected). For $$Z=XY$$ we infer $$\sigma_{z}=\sqrt{Y^{2}\sigma_{x}^{2}+X^{2}\sigma_{y}^{2}}$$. 
 >
 {: .callout}
-
-
-
-## Bootstrapping
-
-Bootstrapping is a method to leverage the power of large samples of data (ideally $$n=100$$ or more) in order to generate 'fake' samples of data with similar statistical properties, simply by resampling the original data set with replacement. Assuming that they are the same size as the original sample, the variation in the new samples that are produced by bootstrapping is equivalent to what would be observed if the data was resampled from the underlying population. This means that bootstrapping is a remarkably cheap and easy way to produce Monte Carlo simulations of any type of quantity, estimator or statistic generated from the data. The resulting samples can thus be used to determine confidence intervals and other quantities, even when the underlying population distribution is not known.
-
-
-###  Bootstrapping to obtain error estimates
-
-Now we'll generate some fake correlated data, and then use the Numpy `choice` function (see Episode 1) to randomly select samples of the data (with replacement) for a bootstrap analysis of the variation in linear fit parameters $$a$$ and $$b$$. We will first generate fake sets of correlated $$x$$ and $$y$$ values as in the earlier example for exploring the correlation coefficient. Use 100 data points for $$x$$ and $$y$$ to start with and plot your data to check that the correlation is clear.
-
-~~~
-x = sps.norm.rvs(size=100)
-y = x + 0.5*sps.norm.rvs(size=100)
-~~~
-{: .language-python}
-
-First use `curve_fit` to obtain the $$a$$ and $$b$$ coefficients for the simulated, 'observed' data set and print your results.
-
-When making our new samples, we need to make sure we sample the same indices of the array for all variables being sampled, otherwise we will destroy any correlations that are present.  Here you can do that by setting up an array of indices matching that of your data (e.g. with `numpy.arange(len(x))`), randomly sampling from that using `choice`, and then using the `numpy.take` function to select the values of `x` and `y` which correspond to those indices of the arrays. Then use `curve_fit` to obtain the coefficients $$a$$ and $$b$$ of the linear correlation and record these values to arrays. Use a loop to repeat the process a large number of times (e.g. 1000 or greater) and finally make a scatter plot of your values of $$a$$ and $$b$$, which shows the bivariate distribution expected for these variables, given the scatter in your data. 
-
-Now find the mean and standard deviations for your bootstrapped distributions of $$a$$ and $$b$$, print them and compare with the expected errors on these values given in the lecture slides. These estimates correspond to the errors of each, ___marginalised over the other variable___. Your distribution could also be used to find the covariance or correlation coefficient between the two variables. 
-
-__Note that the standard error on the mean of $$a$$ or $$b$$ is not relevant for estimating the errors here__ because you are trying to find the scatter in the values expected from your observed number of data points, not the uncertainty on the many repeated 'bootstrap' versions of the data.
-
-Try repeating for repeated random samples of your original $$x$$ and $$y$$ values to see the change in position of the distribution as your sample changes. Try changing the number of data points in the simulated data set, to see how the scatter in the distributions change. How does the simulated distribution compare to the 'true' model values for the gradient and intercept, that you used to generate the data?
-
-__Note that if you want to do bootstrapping using a larger set of variables, you can do this more easily by using a Pandas dataframe and using the `pandas.DataFrame.sample` function__.  By setting the number of data points in the sample to be equal to the number of rows in the dataframe, you can make a resampled dataframe of the same size as the original. Be sure to sample with replacement!
-
-~~~
-nsims = 1000
-indices = np.arange(len(x))
-func = lambda x, a, b: x*a+b
-r2, pcov = spopt.curve_fit(func, x,y, p0=(1,1))
-a_obs = r2[0]
-b_obs = r2[1]
-
-print("The obtained a and b coefficients are ",a_obs,"and",b_obs,"respectively.")
-
-a_arr = np.zeros(nsims)
-b_arr = np.zeros(nsims)
-rng = np.random.default_rng()  # Set up the generator with the default system seed
-for i in range(nsims):
-    new_indices = rng.choice(indices, size=len(x), replace=True)
-    new_x = np.take(x,new_indices)
-    new_y = np.take(y,new_indices)
-    r2, pcov = spopt.curve_fit(func, new_x,new_y, p0=(1,1))
-    a_arr[i] = r2[0]
-    b_arr[i] = r2[1]
-    
-plt.figure()
-plt.plot(a_arr, b_arr, "o")
-plt.xlabel("a", fontsize=14)
-plt.ylabel("b", fontsize=14)
-plt.tick_params(axis='x', labelsize=12)
-plt.tick_params(axis='y', labelsize=12)
-plt.show()
-
-print("The mean and standard deviations of the bootstrapped samples of $a$ are:",
-      np.mean(a_arr),"and",np.std(a_arr,ddof=1),"respectively")
-print("The mean and standard deviations of the bootstrapped samples of $b$ are:",
-      np.mean(b_arr),"and",np.std(b_arr,ddof=1),"respectively")
-~~~
-{: .language-python}
