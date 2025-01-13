@@ -57,7 +57,7 @@ Focus, for the moment, on the dashed line distribution labelled $H_0$. With a si
 
 To look at your probability of falsely rejecting $H_1$, you have to look at the probability distribution for $H_1$, i.e. the solidly coloured curve in the Figure above. You might notice that the area under that curve has different shades of blue below and above the critical test statistic. The area under the curve below $Z_mathrm{crit}$ denotes your probability of falsely accepting $H_0$ if $H_1$ is true, also usually denoted as $\beta$. This is the false negative or Type II error. For the case plotted, this probability is over 28%, so you will miss nearly 1 in 4 interesting supernovae! Conversely, you have a probability of correctly rejecting $H_0$ in 72% of all cases. This probability is also called the *power* of the test. 
 
-Earlier, we said that there is a trade-off between $\alpha$ and $\beta$, and the figure illustrates that quite well: choosing $\alpha$ to a smaller value moves the vertical line for $Z_\mathrm{crit}$ to the right. But this means that more of the distribution for the test statistic $H_1$ will be to the left of that line, and your probability of a false negative becomes larger. The same is true if we try to optimize for a smaller Type II error, i.e. a smaller $\beta$, which moves the line to the left, and we have to accept more false positives. 
+Earlier, we said that there is a trade-off between $\alpha$ and $\beta$, and the figure illustrates that quite well: choosing $\alpha$ to a smaller value moves the vertical line for $Z_\mathrm{crit}$ to the right. But this means that more of the distribution for the test statistic $H_1$ will be to the left of that line, and your probability of a false negative becomes larger. The same is true if we try to optimize for a smaller Type II error, i.e. a smaller $\beta$, which moves the line to the left, and we have to accept more false positives. In general, you often decide which of the two is more important to you ($\alpha$ or $\beta$) and fix that to your desired threshold, and as a consequence, the other will be set automatically given the properties of your data and the statistical test you have chosen. Some fields, like machine learning, attempt to optimize the trade-off between Type I and Type II errors by plotting the false positive rate (Type I error) versus true positive rate (power) for a large number of thresholds. This is called a Receiver Operating Curve (ROC), but is not that commonly used in scientific studies. 
 
 This will always be true, but how well you can detect the effect you're looking for depends on two additional factors. The first is the sample size. In the plot above, we have 20 data points (in the bottom right is the number of samples). What happens if we make that number larger? 
 
@@ -67,9 +67,19 @@ This will always be true, but how well you can detect the effect you're looking 
 
 Take a look at this figure: here, we have 66 data points. The peaks of the probability distributions have moved off the top of the plot (sorry about that), but more importantly, they  have narrowed. If you now look at the different measures below the plot, you see that $\alpha$ hasn't changed (because I deliberately set it to that value), but now your chance of making a Type II error has become drastically smaller. For well-behaved tests, this will generally be true: if you gather more data, your test will become more expressive. 
 
+The final quantity that can influence your Type I and Type II errors is the *effect size*. This measures, well, the size of the effect you're tyring to measure, or how far the distributions for $H_0$ and $H_1$ are apart from each other in the test statistics they produce. In the Figure above, the effect size is measured as a quantity called *Cohen's d*, which is often used for $t$-tests. It gives you a measure of the distance between the means of two samples divided by a joint measure of the variances of the two samples, $s$:
 
+$$
+d = \frac{\mu_1 - \mu_2}{s}
+$$
 
+where
 
+$$
+s = \sqrt{\frac{(n_1 -1)\sigma_1^2 + (n_2 -1)\sigma_2^2}{n_1 + n_2 -2}}
+$$
+
+The larger the distance between the two means, the larger the effect size measured by Cohen's d will be and the further apart the distributions will be in the plot above. However, if the variances of the two samples is large, then the denominator will be relatively larger compared to the nominator, and Cohen's d will be small, and the distributions will overlap more. 
 
 
 
